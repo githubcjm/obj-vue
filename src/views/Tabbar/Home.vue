@@ -40,25 +40,25 @@
     <!-- 这里可以写循环 -->
     <van-swipe :autoplay="3000" indicator-color="white" class="vanswipe">
       <van-swipe-item>
-        <img src="https://img2.1date1cake.com/data/app_ad/1564808873190408456.jpg" alt />
+        <img src="https://img2.1date1cake.com/data/app_ad/1565317400356914088.jpg" alt />
       </van-swipe-item>
       <van-swipe-item>
-        <img src="https://img1.1date1cake.com/data/app_ad/1564623197291799575.jpg" alt />
+        <img src="https://img1.1date1cake.com/data/app_ad/1565185349967060333.jpg" alt />
       </van-swipe-item>
       <van-swipe-item>
-        <img src="https://img2.1date1cake.com/data/app_ad/1564808899904934708.jpg" alt />
-      </van-swipe-item>
-      <van-swipe-item>
-        <img src="https://img2.1date1cake.com/data/app_ad/1558408710969918899.jpg" alt />
-      </van-swipe-item>
-      <van-swipe-item>
-        <img src="https://img2.1date1cake.com/data/app_ad/1558408710969918899.jpg" alt />
-      </van-swipe-item>
-      <van-swipe-item>
-        <img src="https://img1.1date1cake.com/data/app_ad/1563869889773477882.jpg" alt />
+        <img src="https://img1.1date1cake.com/data/app_ad/1558408710969918899.jpg" alt />
       </van-swipe-item>
       <van-swipe-item>
         <img src="https://img1.1date1cake.com/data/app_ad/1546212496160937947.jpg" alt />
+      </van-swipe-item>
+      <van-swipe-item>
+        <img src="https://img2.1date1cake.com/data/app_ad/1565317400356914088.jpg" alt />
+      </van-swipe-item>
+      <van-swipe-item>
+        <img src="https://img2.1date1cake.com/data/app_ad/1558331122626201389.jpg" alt />
+      </van-swipe-item>
+      <van-swipe-item>
+        <img src="https://img1.1date1cake.com/data/app_ad/1565185349967060333.jpg" alt />
       </van-swipe-item>
     </van-swipe>
 
@@ -95,6 +95,7 @@
     </div>
     <!-- //懒加载 -->
     <van-list
+      class="addclass"
       style="margin-bottom:50px"
       v-model="loading"
       :finished="finished"
@@ -109,7 +110,7 @@
             <ul>
               <li v-for="(item,index) in shopList" :key="index" num="2" price="2.00">
                 <!-- 这里写点击跳转详情页，带id -->
-                <router-link :to="'/login'">
+                <router-link :to="'/shop/id='+item.id ">
                   <a>
                     <div class="item">
                       <div class="img">
@@ -336,6 +337,51 @@ export default {
 .msgpic {
   height: 529px;
   width: 335px;
+}
+.van-swipe {
+  position: absolute;
+  /* position: relative; */
+  overflow: hidden;
+  -webkit-user-select: none;
+  user-select: none;
+  max-width: 500px;
+  margin: auto;
+  left: 0;
+  right: 0;
+  top: 30px;
+}
+.van-grid {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-flex-wrap: wrap;
+  flex-wrap: wrap;
+  position: absolute;
+  top: 255px;
+  left: 0;
+  right: 0;
+  margin: auto;
+  max-width: 500px;
+}
+.img-link-wrapper {
+  position: absolute;
+  padding: 0.1rem 0.2rem 0.1rem 0.2rem;
+  background: #ffffff;
+  overflow: hidden;
+  top: 330px;
+  left: 0;
+  right: 0;
+  max-width: 500px;
+  margin: auto;
+}
+.addclass {
+  position: absolute;
+  margin: auto;
+  margin-bottom: 50px;
+  max-width: 500px;
+  left: 0;
+  right: 0;
+  top: 465px;
 }
 </style>
 

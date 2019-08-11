@@ -58,6 +58,11 @@ export default {
       sms: "",
       istrue: true
     };
+  },
+  created() {
+    if (data) {
+      alert("您已登录了！");
+    }
   }
 };
 </script>

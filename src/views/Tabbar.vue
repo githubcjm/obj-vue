@@ -30,7 +30,7 @@
       >购物车</van-tabbar-item>
       <van-tabbar-item
         icon="https://css-m.1date1cake.com/themes/1d1c/images/v2/index/footer-icon4.png"
-        @click="add(tabbarItem[3].url)"
+        @click="add1(tabbarItem[3].url)"
       >个人中心</van-tabbar-item>
     </van-tabbar>
   </div>
@@ -60,6 +60,13 @@ export default {
   methods: {
     add(name) {
       this.$router.push(name);
+    },
+    add1(name) {
+      this.$router.push(name);
+      let data = document.cookie;
+      if (data) {
+        alert("您已经登录了!");
+      }
     }
   }
 };

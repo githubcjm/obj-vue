@@ -1,9 +1,9 @@
 import Vue from 'vue'
 import App from './App.vue'
 //全局引入axios
-import axios from 'axios'
+
 // import Router from 'vue-router'
-import './index.css'
+// import './index.css'
 // 首页
 import './style/index.css'
 
@@ -23,6 +23,14 @@ import store from './store'
 
 // import Home from './components/Home.vue'
 import Tabbar from './views/Tabbar'
+
+//跨域
+import axios from 'axios'
+axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded'; //全局更改
+import qs from 'qs'
+Vue.prototype.$qs = qs;
+//把插件或者方法放到vue的原型链上
+Vue.prototype.$axios = axios
 
 // import Detail from './views/Detail'
 //懒加载
@@ -63,7 +71,7 @@ const routes = [
   //详情页
   {
     name: 'shop',
-    path: '/shop',
+    path: '/shop/:id',
     component: Shop
   },
   {
@@ -124,30 +132,25 @@ const router = new VueRouter({
   routes
 })
 
-//全局守卫
-// router.beforeEach(async (to, from, next) => {
-//   //发送请求获取令牌
-//   let data = await axios.post("https://www.easy-mock.com/mock/5d40123c05c59f1e0bf0bbdf/list/login", {
-//     params: {
-//       token: 'qwe123'
-//     },
-//   });
-//   let islogin = data.data.data.status;
-//   if (islogin || to.path === "/sign" || to.path === "/tabbar/home" || to.path === "/detail" || to.path === "/adr" || to.path === "/tabbar/order") {
-//     next();
-//   } else {
-//     router.push({
-//       name: 'sign'
-//     })
-//   }
+// 全局守卫
+router.beforeEach(async (to, from, next) => {
+  //发送请求获取令牌
+  let data = document.cookie
+  // let islogin = data.data.data.status;
+  if (data || to.path === "/sign" || to.path === "/login" || to.path === "/tabbar/home" || to.path === "/tabbar/order") {
+    next();
+  } else {
+    router.push({
+      name: 'login'
+    })
+  }
 
-// })
+
+})
 
 
 
 
-//把插件或者方法放到vue的原型链上
-Vue.prototype.$axios = axios
 
 import Vant from './vant/index'
 // import router from './router'

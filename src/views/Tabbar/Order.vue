@@ -9,10 +9,12 @@
       </div>
       <div class="center">蛋糕</div>
       <div class="right">
-        <a href="flow.php?hmpl=header_v2" class="cart">
-          <em id="top_cart_v2">0</em>
-        </a>
-        <a href="javascript:;" class="service" onclick="servicePopupShow();"></a>
+        <router-link to="/tabbar/home">
+          <a class="cart">
+            <em id="top_cart_v2">0</em>
+          </a>
+          <a class="service"></a>
+        </router-link>
       </div>
     </div>
     <!-- 遮罩层左边 -->
@@ -21,8 +23,9 @@
         <ul>
           <li class="red nav_btns">
             <!-- <a href="/login" class="btn_nav">登录</a> -->
-            <router-link to="/login" class="btn_nav">登录</router-link>
-            <router-link to="/sign" class="btn_nav" style="margin-right:0;">注册</router-link>
+            <router-link to="/login" class="btn_nav" v-show="istrue">登录</router-link>
+            <router-link to="/sign" class="btn_nav" style="margin-right:0;" v-show="istrue">注册</router-link>
+            <a @click="setCookie(cookiesname)" class="btn_nav" v-show="issure">退出</a>
           </li>
 
           <li class="white" v-for="(item,index) in navlist" :key="index">
@@ -38,24 +41,12 @@
     <div class="link-wrapper">
       <div class="type-wrapper swiperRouter swiper-container-horizontal swiper-container-android">
         <div class="swiper-wrapper">
-          <a href="category_v2.php?id=87" class="swiper-slide current swiper-slide-active">生日蛋糕</a>
-          <a href="category_v2.php?id=88" class="swiper-slide swiper-slide-next">甜品下午茶</a>
-          <a href="category_v2.php?id=89" class="swiper-slide">鲜花</a>
-          <a href="category_v2.php?id=91" class="swiper-slide">套餐</a>
-          <a href="category_v2.php?id=90" class="swiper-slide">生日场景包</a>
+          <a class="swiper-slide current swiper-slide-active">生日蛋糕</a>
+          <a class="swiper-slide swiper-slide-next">甜品下午茶</a>
+          <a class="swiper-slide">鲜花</a>
+          <a class="swiper-slide">套餐</a>
+          <a class="swiper-slide">生日场景包</a>
         </div>
-      </div>
-
-      <div class="label-wrapper">
-        <a href="category_v2.php?id=87&amp;tag_id=26">主题生日蛋糕</a>
-        <a href="category_v2.php?id=87&amp;tag_id=84">七夕</a>
-        <a href="category_v2.php?id=87&amp;tag_id=78">经典生日蛋糕</a>
-        <a href="category_v2.php?id=87&amp;tag_id=31">儿童</a>
-        <a href="category_v2.php?id=87&amp;tag_id=29">婚庆</a>
-        <a href="category_v2.php?id=87&amp;tag_id=27">下午茶蛋糕</a>
-        <a href="category_v2.php?id=87&amp;tag_id=28">聚会</a>
-        <a href="category_v2.php?id=87&amp;tag_id=76">大磅数</a>
-        <a href="category_v2.php?id=87&amp;tag_id=77">畅销新品</a>
       </div>
     </div>
     <!-- //列表页 -->
@@ -63,22 +54,24 @@
     <div class="list-wrapper">
       <div class="item-wrapper">
         <ul>
-          <li v-for="(item,index) in shoplist" :key="index" num="2" :to="'/tabbar/dingdan'">
-            <a href="#">
-              <div class="item">
-                <div class="img">
-                  <img :src="item.url" />
-                </div>
-                <div class="info">
-                  <div class="title">杨枝甘露糖水蛋糕</div>
-                  <div class="price">
-                    <span class="shop_price">168元/1.0磅</span>
-                    <span class="original_price">198元</span>
+          <li v-for="(item,index) in shoplist" :key="index" num="2">
+            <router-link :to="'/shop/id='+item.id ">
+              <a>
+                <div class="item">
+                  <div class="img">
+                    <img :src="item.url" />
                   </div>
-                  <div class="msg">港式糖水蛋糕</div>
+                  <div class="info">
+                    <div class="title">杨枝甘露糖水蛋糕</div>
+                    <div class="price">
+                      <span class="shop_price">168元/1.0磅</span>
+                      <span class="original_price">198元</span>
+                    </div>
+                    <div class="msg">港式糖水蛋糕</div>
+                  </div>
                 </div>
-              </div>
-            </a>
+              </a>
+            </router-link>
           </li>
           <!-- <li>
             <a href="goods-861.html">
@@ -106,6 +99,9 @@
 export default {
   data() {
     return {
+      istrue: "",
+      issure: "",
+      isActive: false,
       show: false,
       shoplist: [],
       // 遮罩层
@@ -131,12 +127,26 @@ export default {
           url:
             "https://img1-m.1date1cake.com/themes/1d1c/images/2.0/balloon.jpg"
         }
-      ]
+      ],
+      cookiesname: ""
     };
   },
   methods: {
     showPopup() {
       this.show = true;
+    },
+    //删除用户信息cookie
+    //kye键名
+    setCookie(keys) {
+      this.istrue = true;
+      this.issure = false;
+      var now = new Date();
+      now.setDate(now.getDate() + -1);
+      document.cookie =
+        keys + "=" + "" + ";expires=" + now.toUTCString() + ";path=/";
+      alert("退出成功");
+      //拿取cookie
+      // this.cookies=
     }
   },
   async created() {
@@ -144,7 +154,13 @@ export default {
       "https://www.easy-mock.com/mock/5d40123c05c59f1e0bf0bbdf/list/indexlist"
     );
     this.shoplist = [...this.shoplist, ...lists.data.data.A];
-    console.log(this.shoplist);
+
+    this.cookiesname = document.cookie.split("=")[0];
+    if (this.cookiesname) {
+      this.issure = true;
+    } else {
+      this.istrue = true;
+    }
   }
 };
 </script>
@@ -155,8 +171,8 @@ export default {
   border: 0px;
 }
 .van-popup--center {
-  position: absolute;
-  left: 240px;
+  position: fixed;
+  left: 300px;
   width: 268px;
   height: 260px;
   top: 100px;
@@ -164,6 +180,38 @@ export default {
 #user_nav {
   width: 262px;
   top: 31px;
+}
+.link-wrapper {
+  padding-left: 30px;
+  top: 50px;
+  position: absolute;
+  /* overflow: hidden; */
+  background: #ffffff;
+  margin-top: 40px;
+  left: 0;
+  right: 0;
+  margin: auto;
+  max-width: 470px;
+}
+.list-wrapper {
+  overflow: hidden;
+  background: #ffffff;
+  margin: 0.15rem 0 0 0;
+  padding: 0.2rem 0;
+  margin: auto;
+  position: absolute;
+  left: 0;
+  right: 0;
+  max-width: 500px;
+  top: 78px;
+}
+#user_nav ul li.red a {
+  position: absolute;
+  margin: 0;
+  color: #fff;
+  position: relative;
+  top: -7px;
+  left: -25px;
 }
 </style>
 

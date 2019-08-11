@@ -8,9 +8,11 @@
       </div>
       <div class="center">产品详情</div>
       <div class="right">
-        <a href="flow.php?hmpl=header_v2" class="cart">
-          <em id="top_cart_v2">0</em>
-        </a>
+        <router-link to="/tabbar/home">
+          <a class="cart">
+            <em id="top_cart_v2">0</em>
+          </a>
+        </router-link>
         <router-link to="/tabbar/home" class="service"></router-link>
       </div>
     </div>
@@ -36,7 +38,7 @@
 
     <!-- //轮播 -->
     <van-swipe :autoplay="3000">
-      <van-swipe-item v-for="(image,index) in images" :key="index">
+      <van-swipe-item v-for="(image,index) in shoplist.images" :key="index">
         <img v-lazy="image" />
       </van-swipe-item>
     </van-swipe>
@@ -47,9 +49,9 @@
       num="2"
       tag="标签"
       price="2.00"
-      desc="描述信息"
-      title="商品标题"
-      thumb="https://img.yzcdn.cn/vant/t-thirt.jpg"
+      :desc="shoplist.title"
+      :title="shoplist.name"
+      :thumb="shoplist.url"
       origin-price="10.00"
     />
 
@@ -62,12 +64,6 @@
     </div>
     <!-- 上拉菜单 -->
     <!-- 弹出详情价格 -->
-    <van-action-sheet v-model="show1" title="标题">
-      <p>
-        <!-- 这里放商品规格的组件 -->
-        <!-- //加入购物车 -->
-      </p>
-    </van-action-sheet>
 
     <!-- 客户评价 -->
     <div class="evaluate-wrapper" id="evaluate">
@@ -98,17 +94,26 @@
     <!-- 产品介绍 -->
     <div class="introduce">产品介绍</div>
     <div class="introduce-pic">
-      <img src="https://img2.1date1cake.com/images/201906/1559789622614794148.jpg" alt />
+      <img :src="shoplist.bigpic" alt />
     </div>
 
     <!-- 商品导航 -->
-    <!-- 点击事件分别绑定不同事件，第二个跳到购物车页面，第三第四跳到商品规格     -->
+    <!-- 点击事件分别绑定不同事件，第二个跳到购物车页面，第三第四跳到商品规格，加入购物车还是留在本页，立即购买确定后跳到购物车页面     -->
     <van-goods-action>
       <van-goods-action-icon icon="chat-o" text="客服" @click="onClickIcon" />
       <van-goods-action-icon icon="cart-o" text="购物车" @click="onClickIcon" />
       <van-goods-action-button type="warning" text="加入购物车" @click="onClickButton" />
       <van-goods-action-button type="danger" text="立即购买" @click="onClickButton" />
     </van-goods-action>
+
+    <!-- //购物车 -->
+    <van-sku
+      v-model="show3"
+      :sku="sku"
+      :goods="goods"
+      @buy-clicked="onBuyClicked"
+      @add-cart="onAddCartClicked"
+    />
   </div>
 </template>
 
@@ -117,7 +122,6 @@ export default {
   data() {
     return {
       show: false,
-      show1: false,
       show2: true,
       navlist: [
         {
@@ -142,29 +146,138 @@ export default {
             "https://img1-m.1date1cake.com/themes/1d1c/images/2.0/balloon.jpg"
         }
       ],
-      //轮播图
-      images: [
-        "https://img2.1date1cake.com/images/201906/goods_img/869_P_1560507001107.jpg",
-        "https://img1.1date1cake.com/images/201907/goods_img/869_G_1563868812687.jpg"
-      ]
+      shoplist: {},
+      //购物车
+      show3: false,
+      sku: {
+        // 所有sku规格类目与其值的从属关系，比如商品有颜色和尺码两大类规格，颜色下面又有红色和蓝色两个规格值。
+        // 可以理解为一个商品可以有多个规格类目，一个规格类目下可以有多个规格值。
+        tree: [
+          {
+            k: "颜色", // skuKeyName：规格类目名称
+            v: [
+              {
+                id: "1215", // skuValueId：规格值 id
+                name: "红色", // skuValueName：规格值名称
+                imgUrl: "https://img.yzcdn.cn/2.jpg" // 规格类目图片，只有第一个规格类目可以定义图片
+              },
+              {
+                id: "1215",
+                name: "蓝色",
+                imgUrl: "https://img.yzcdn.cn/2.jpg"
+              }
+            ],
+            k_s: "s1" // skuKeyStr：sku 组合列表（下方 list）中当前类目对应的 key 值，value 值会是从属于当前类目的一个规格值 id
+          }
+        ],
+        // 所有 sku 的组合列表，比如红色、M 码为一个 sku 组合，红色、S 码为另一个组合
+        list: [
+          {
+            id: 2259, // skuId，下单时后端需要
+            price: 100, // 价格（单位分）
+            s1: "1215", // 规格类目 k_s 为 s1 的对应规格值 id
+            s2: "1193", // 规格类目 k_s 为 s2 的对应规格值 id
+            s3: "0", // 最多包含3个规格值，为0表示不存在该规格
+            stock_num: 110 // 当前 sku 组合对应的库存
+          }
+        ],
+        price: "1.00", // 默认价格（单位元）
+        stock_num: 227, // 商品总库存
+        collection_id: 2261, // 无规格商品 skuId 取 collection_id，否则取所选 sku 组合对应的 id
+        none_sku: false, // 是否无规格商品
+        messages: [
+          {
+            // 商品留言
+            datetime: "0", // 留言类型为 time 时，是否含日期。'1' 表示包含
+            multiple: "0", // 留言类型为 text 时，是否多行文本。'1' 表示多行
+            name: "留言", // 留言名称
+            type: "text", // 留言类型，可选: id_no（身份证）, text, tel, date, time, email
+            required: "1", // 是否必填 '1' 表示必填
+            placeholder: "" // 可选值，占位文本
+          }
+        ],
+        hide_stock: false // 是否隐藏剩余库存
+      },
+      goods: {
+        // 商品标题
+        title: "测试商品",
+        // 默认商品 sku 缩略图
+        picture: "https://img.yzcdn.cn/2.jpg"
+      },
+      messageConfig: {
+        // 图片上传回调，需要返回一个promise，promise正确执行的结果需要是一个图片url
+        uploadImg: () => {
+          return new Promise(resolve => {
+            setTimeout(
+              () =>
+                resolve(
+                  "https://img.yzcdn.cn/upload_files/2017/02/21/FjKTOxjVgnUuPmHJRdunvYky9OHP.jpg!100x100.jpg"
+                ),
+              1000
+            );
+          });
+        },
+        // 最大上传体积 (MB)
+        uploadMaxSize: 3,
+        // placeholder 配置
+        placeholderMap: {
+          text: "xxx",
+          tel: "xxx"
+        }
+      }
     };
   },
   methods: {
     //商品导航
     // 这里绑定事件
     onClickIcon() {
-      Toast("点击图标");
+      // Toast("点击图标");
+      console.log(qwe);
     },
     onClickButton() {
-      Toast("点击按钮");
+      this.show3 = true;
     },
 
     hidshop() {
-      this.show1 = true;
+      this.show3 = true;
     },
     showPopup() {
       this.show = true;
+    },
+    onAddCartClicked() {
+      // 点击加入购物车拿取图片name.title,id,存到数据库
+      //还有用户id，购物车页面根据用户id和商品id查询数据渲染
+      this.$axios({
+        method: "post",
+        //headers: { "content-type": "application/x-www-form-urlencoded" },//局部更改
+        url: "http://localhost:3000/sign/login",
+        data: this.$qs.stringify({
+          url: this.shoplist.url,
+          name: this.shoplist.name,
+          title: this.shoplist.title,
+          id: this.shoplist.id,
+          //用户id或者用令牌
+          uid: "cjm"
+        })
+      }).then(res => {
+        console.log(res);
+      });
     }
+  },
+  async created() {
+    console.log(this.value);
+
+    //拿取id=n，访问数据库生成对应的
+    let lists = await this.$axios.post(
+      "https://www.easy-mock.com/mock/5d40123c05c59f1e0bf0bbdf/list/shoplist"
+    );
+    // console.log(this.$router.app.$el.baseURI.slice(-1));
+    //那对应id的后台数据
+    let dataId = this.$router.app.$el.baseURI.slice(-1);
+    this.shoplist = lists.data.data.A[dataId - 1];
+    console.log(lists.data.data);
+    // console.log(this.$router.app.$el.baseURI.slice(-1));
+    console.log(value);
   }
 };
 </script>
